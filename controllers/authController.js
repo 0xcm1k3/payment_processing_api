@@ -82,7 +82,7 @@ const sign_in = (req, res) => {
     }
     const token = jwt.sign(
       {
-        "email address": results[0].email_address,
+        email: results[0].email_address,
         createdAT: Date.now(),
       },
       process.env.AUTH_KEY ?? "password",

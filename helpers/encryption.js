@@ -25,7 +25,7 @@ exports.encrypt = (text, encoding) => {
 
     return result;
   } catch (e) {
-    console.log(e.message);
+    logger.debug(e.message ?? error);
     return undefined;
   }
 };

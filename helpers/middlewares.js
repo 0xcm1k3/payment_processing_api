@@ -1,3 +1,4 @@
+const jsonwebtoken = require("jsonwebtoken");
 require("dotenv").config();
 const setUser = (req, res, next) => {
   if (req.headers && req.headers.authorization) {
@@ -20,7 +21,20 @@ const setUser = (req, res, next) => {
     next();
   }
 };
-
+loginRequired = function (req, res, next) {
+  if (req.user) {
+    next();
+  } else if (req.sessionExpired) {
+    return res
+      .status(440)
+      .json({ error: "SESSION TIMED OUT", code: "session_expired" });
+  } else {
+    return res
+      .status(401)
+      .json({ error: "unauthorized user", code: "user_not_auth" });
+  }
+};
 module.exports = {
   setUser,
+  loginRequired,
 };

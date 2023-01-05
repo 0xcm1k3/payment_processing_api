@@ -3,13 +3,23 @@ const mysql = require("mysql");
 const { excuteSQL, initDB } = require("./helpers/database");
 const logger = require("./helpers/logger");
 const { setUser } = require("./helpers/middlewares");
-const authRoute = require("./routes/authentication/authRoute");
+const authRoute = require("./routes/authRoute");
+const paymentsRoute = require("./routes/paymentsRoute");
 require("dotenv").config();
 const app = express();
-app.use(express.json());
-
 app.use(setUser);
+
+// ignore validating json incase the webhook received request
+app.use((req, res, next) => {
+  if (req.originalUrl === "/payments/stripe/webhook") {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
+
 app.use("/auth", authRoute);
+app.use("/payments", paymentsRoute);
 
 initDB(async (error) => {
   if (error) {

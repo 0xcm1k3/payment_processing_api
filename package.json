@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "bcrypt": "^5.1.0",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
@@ -17,6 +18,7 @@
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.20",
+    "stripe": "^11.5.0",
     "uuid": "^9.0.0"
   }
 }

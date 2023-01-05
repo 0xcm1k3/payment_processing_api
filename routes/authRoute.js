@@ -1,5 +1,5 @@
 const express = require("express");
-const { sign_in, sign_up } = require("../../controllers/authController");
+const { sign_in, sign_up } = require("../controllers/authController");
 
 router = express.Router();
 router.route("/").all((req, res) => res.sendStatus(405));

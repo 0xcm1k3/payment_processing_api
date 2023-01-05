@@ -21,6 +21,7 @@ const initDB = async (callback) => {
         full_name varchar(255) NOT NULL,
         email_address varchar(255) UNIQUE,
         password varchar(255),
+        stripe_id varchar(255),
         registeredAt TIMESTAMP  DEFAULT CURRENT_TIMESTAMP NOT NULL,
         lastSeenAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         PRIMARY KEY (ID),
@@ -28,8 +29,11 @@ const initDB = async (callback) => {
     );
     CREATE TABLE IF NOT EXISTS ORDERS (
         ID int NOT NULL AUTO_INCREMENT,
-        order_owner varchar(255) NOT NULL,
-        order_total varchar(255),
+        owner varchar(255) NOT NULL,
+        total varchar(255),
+        status ENUM("COMPLETED","CANCELED","PENDING"),
+        transction_id varchar(255),
+        payment_method ENUM("STRIPE","PAYPAL"),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
         PRIMARY KEY (ID),
         UNIQUE (ID)
