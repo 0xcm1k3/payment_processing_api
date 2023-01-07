@@ -2,6 +2,7 @@ const { excuteSQL } = require("../helpers/database");
 const { hashThis, compareHash } = require("../helpers/encryption");
 const jwt = require("jsonwebtoken");
 const validator = require("../helpers/validation");
+const logger = require("../helpers/logger");
 // sign_up
 const sign_up = (req, res) => {
   if (
@@ -49,7 +50,11 @@ const sign_up = (req, res) => {
           error: "email address is already in use",
           error_code: "invalid_email_address",
         });
-      return res.status(403).send(err);
+      logger.error(err);
+      return res.status(403).send({
+        error: "unhandled error, please contact the admin",
+        code: "unexpected_error",
+      });
     }
     return res.send({ message: "success" });
   });
@@ -64,7 +69,13 @@ const sign_in = (req, res) => {
   const checkifUserExist = `SELECT email_address,password FROM USERS WHERE email_address=\"${req.body.email_address}\" LIMIT 1`;
 
   excuteSQL(checkifUserExist, (err, results) => {
-    if (err) return res.status(400).send(err);
+    if (err) {
+      logger.error(err);
+      return res.status(400).send({
+        error: "unhandled error, please contact the admin",
+        code: "unexpected_error",
+      });
+    }
 
     if (results.length == 0)
       return res.status(404).send({

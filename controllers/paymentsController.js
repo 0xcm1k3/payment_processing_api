@@ -65,7 +65,13 @@ createStripeNewPayment = async (req, res) => {
   try {
     const userQuery = `SELECT email_address,stripe_id from USERS WHERE email_address=\"${req.user.email}\" LIMIT 1`;
     excuteSQL(userQuery, async (err, results) => {
-      if (err) return res.status(400).send(err);
+      if (err) {
+        logger.error(err);
+        return res.status(400).send({
+          error: "unhandled error, please contact the admin",
+          code: "unexpected_error",
+        });
+      }
       if (results[0].stripe_id == null || !results[0].stripe_id) {
         logger.debug(
           `creating STRIPE customer ID for user => ${req.user.email}`
@@ -78,7 +84,13 @@ createStripeNewPayment = async (req, res) => {
             });
           const _setUserStripeIDQuery = `UPDATE USERS SET stripe_id=\"${customerID}\" WHERE email_address=\"${req.user.email}\"`;
           excuteSQL(_setUserStripeIDQuery, async (err, results) => {
-            if (err) return res.status(400).send(err);
+            if (err) {
+              logger.error(err);
+              return res.status(400).send({
+                error: "unhandled error, please contact the admin",
+                code: "unexpected_error",
+              });
+            }
             let url = await _createSession(customerID);
             return res.send({
               checkout_url: url,
@@ -194,7 +206,13 @@ createPayPalNewPayment = async (req, res) => {
   let response = await client.execute(request);
   const newOrderQuery = `INSERT INTO ORDERS (owner,total,status,payment_method,transction_id) VALUES ('${req.user.email}','${req.body.amount}','PENDING','PAYPAL','${response.result.id}')`;
   excuteSQL(newOrderQuery, (err, results) => {
-    if (err) return res.status(400).send(err);
+    if (err) {
+      logger.error(err);
+      return res.status(400).send({
+        error: "unhandled error, please contact the admin",
+        code: "unexpected_error",
+      });
+    }
     return res.send({
       checkout_url: response.result.links.find((link) => link.rel === "approve")
         .href,
@@ -206,14 +224,23 @@ const handlePayPalPayment = async (req, res) => {
   const orderQuery = `SELECT status,transction_id FROM ORDERS WHERE transction_id='${req.query.token}' LIMIT 1`;
   if (req.query.cancel && req.query.cancel?.toLowerCase() == "true") {
     excuteSQL(orderQuery, (err, results) => {
-      if (err) return res.status(400).send(err);
+      if (err) {
+        logger.error(err);
+        return res.status(400).send({
+          error: "unhandled error, please contact the admin",
+          code: "unexpected_error",
+        });
+      }
       if (results.length != 0 && results[0].status == "PENDING") {
         excuteSQL(
           `UPDATE ORDERS SET status='CANCELED' WHERE transction_id='${req.query.token}'`,
           (err, order) => {
             if (err) {
               logger.error(err);
-              return res.status(400).send(err);
+              return res.status(400).send({
+                error: "unhandled error, please contact the admin",
+                code: "unexpected_error",
+              });
             }
           }
         );
@@ -230,7 +257,10 @@ const handlePayPalPayment = async (req, res) => {
     excuteSQL(orderQuery, (err, results) => {
       if (err) {
         logger.error(err);
-        return res.status(400).send(err);
+        return res.status(400).send({
+          error: "unhandled error, please contact the admin",
+          code: "unexpected_error",
+        });
       }
       if (results.length != 0) {
         excuteSQL(
@@ -238,7 +268,10 @@ const handlePayPalPayment = async (req, res) => {
           (err, order) => {
             if (err) {
               logger.error(err);
-              return res.status(400).send(err);
+              return res.status(400).send({
+                error: "unhandled error, please contact the admin",
+                code: "unexpected_error",
+              });
             }
             return res.status({ message: "success" });
           }
